@@ -20,12 +20,25 @@ section .bss ; uninitialized variables
 
 section .text
 
+%macro ioctl 3
+    pushad ; push all registers to the stack
+
+    mov eax, sys_ioctl ; set eax to sys_ioctl code
+    mov ebx, %1 ; set ebx to %1
+    mov ecx, %2 ; set ecx to %2
+    mov edx, %3 ; set edx to %3
+
+    execute ; call system to execute ioctl
+
+    popad ; pop all registers from the stack
+%endmacro
+
 %macro getIndex 2 ; get 1d index from 2d coords
     pushad ; push all registers to the stack
     
     mov eax, %2 ; set eax to y
 
-    imul eax, gridWidth ; multiply y with gridwidth
+    imul eax, [gridWidth] ; multiply y with gridwidth
 
     add eax, %1 ; add x to y * gridwidth
     mov [gridIndex], eax ; set index to result (gridwidth * y + x)
@@ -37,7 +50,7 @@ section .text
     pushad ; push all registers to the stack
     
     mov eax, %1 ; set eax to %1
-    dividemodulo eax, gridWidth ; output x = %1 % gridwidth
+    dividemodulo eax, [gridWidth] ; output x = %1 % gridwidth
                                 ; output y = %1 / gridwidth
     
     mov eax, [moduloResult] ; set eax to modulo result
@@ -58,7 +71,7 @@ section .text
     cmp ebx, ecx ; compare position x with 0
     je %%setIsOnBorder ; set onborder to 1 if ebx == ecx
 
-    mov ecx, gridWidth ; set ecx to gridwidth
+    mov ecx, [gridWidth] ; set ecx to gridwidth
     dec ecx ; decrement ecx by one
 
     cmp ebx, ecx ; compare position x with gridwidth - 1
@@ -70,7 +83,7 @@ section .text
     cmp ebx, ecx ; compare position y with 0
     je %%setIsOnBorder ; set onborder to 1 if ebx == ecx
 
-    mov ecx, gridHeight ; set ecx to gridheight
+    mov ecx, [gridHeight] ; set ecx to gridheight
     dec ecx ; decrement ecx by one
 
     cmp ebx, ecx ; compare position y with gridheight - 1

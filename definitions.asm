@@ -1,6 +1,8 @@
 %ifndef DEFINITIONS_ASM
 %define DEFINITIONS_ASM
 
+section .bss
+
 %define sys_exit 1
 ; exits the program with given code
 ; reads ebx as the exit code
@@ -88,9 +90,14 @@
 
 %define sys_call 80h ; call using int to execute
 
-%define stdin 0 ; standard input
-%define stdout 1 ; standard output
-%define stderr 2 ; standard error
+
+stdin_fd: equ 0 ; STDIN_FILENO
+stdout_fd: equ 1 ; STDOUT_FILENO
+stderr_fd: equ 2 ; STDERR_FILENO
+
+%define stdin 0
+%define stdout 1
+%define stderr 2
 
 %define success 0 ; success code
 
@@ -154,6 +161,11 @@
 %define SIGPOLL 29 ; Pollable event occurred (System V).
 %define SIGPWR 30 ; Power failure imminent.
 %define SIGSYS 31 ; Bad system call.
+
+; ioctl
+
+%define TIOCGWINSZ 0x5413
+
 
 ; calls interrupt sys_call(0x80)
 %define execute int sys_call

@@ -11,6 +11,7 @@
 %include "food.asm"
 
 %include "signal.asm"
+%include "terminal.asm"
 
 section .data ; initialized variables
     newLine db 10, 0
@@ -42,10 +43,11 @@ global _start
 
 _start:
     clearConsole
-    
+
     mov eax, 1 ; set eax to 1
     mov [cursorActive], eax ; set cursor active to eax(1)
-    
+
+    gridInit ; initialize grid (size)
 
     clockGetTime CLOCK_REALTIME_COARSE ; get realtime
     mov ebx, [clockResult + 4] ; ebx = realtimens
@@ -60,20 +62,32 @@ _start:
 
     echo_off ; disable writing char back to stdout
     canonical_off ; set to single char input 
-    
-    setVTime 0 ; set vtime to 0 for instant char input
-    setVMin 1 ; set char min count to 1
-
 
     toggleCursor ; set cursor to hidden
 
 
     createSnake ; create snake
-    gridInit ; initialize grid (food pos)
     
+    mov eax, [gridWidth] ; set eax to gridwidth
+    dec eax ; set eax to gridwidth - 1
+    divide eax, 2 ; (gridwidth - 1) / 2 
+
+    setSnakeX 0, [divideResult] ; set snakex at 0 to (gridwidth - 1) / 2
+
+
+    mov eax, [gridHeight] ; set eax to gridheight
+    dec eax ; set eax to gridheight - 1
+    divide eax, 2 ; (gridheight - 1) / 2 
+
+    setSnakeY 0, [divideResult] ; set snakey at 0 to (gridheight - 1) / 2
+
+
+    generateFood ; set food position
+
 
     setSignalHandler SIGALRM, alarmHandler ; set signal handler for alarm signal to alarm handler
     ualarm snake_usec_movespeed, snake_usec_movespeed ; start alarm with 200ms delay
+
 
     mov eax, 1 ; set eax to 1
 .inputLoop:
@@ -83,7 +97,7 @@ _start:
     jne .inputLoop
 .inputExit:
     printGameOver ; print gameover message
-
+    
     toggleCursor ; show cursor
 
     canonical_on ; enable canonical mode (multiple char inputs)

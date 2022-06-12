@@ -21,7 +21,7 @@ section .text
     pushad ; push all registers to the stack
 
     splitmix32 ; food x
-    mov ebx, gridWidth ; set ebx to gridwidth
+    mov ebx, [gridWidth] ; set ebx to gridwidth
     sub ebx, 2 ; remove the 2 borders from x
     modulo [splitmix32Output], ebx ; splitmix32Output %= (gridWidth - 2)
 
@@ -36,12 +36,12 @@ section .text
     pushad ; push all registers to the stack
 
     splitmix32 ; food y
-    mov ebx, gridHeight ; set ebx to gridheight
-    sub ebx, 3 ; remove the 2 borders from x
+    mov ebx, [gridHeight] ; set ebx to gridheight
+    sub ebx, 3 ; remove the 2 borders from y
     modulo [splitmix32Output], ebx ; splitmix32Output %= (gridHeight - 2)
 
     mov ebx, [moduloResult] ; set ebx to moduloresult
-    inc ebx ; add 1 to ebx to allow min 1 and max (gridWidth - 1)
+    inc ebx ; add 1 to ebx to allow min 1 and max (gridHeight - 1)
     mov [foodY], ebx ; set foody to ebx
     
     popad ; pop all registers from the stack

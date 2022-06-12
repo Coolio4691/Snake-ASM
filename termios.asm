@@ -18,36 +18,7 @@ section .bss ; uninitialized variables
         c_line resb 1     ; line discipline
         c_cc resb 64      ; control characters
 
-    stdin_fd: equ 0 ; STDIN_FILENO
-
 section .text
-
-%macro setVMin 1
-    pushad ; push all registers to the stack
-    
-    read_stdin_termios
-    
-    mov eax, %1
-
-    mov [termios + 17 + VMIN], eax
-
-    write_stdin_termios
-
-    popad ; pop all registers from the stack
-%endmacro
-
-%macro setVTime 1
-    pushad ; push all registers to the stack
-
-    read_stdin_termios
-    
-    mov eax, %1
-    mov [termios + 17 + VTIME], eax
-
-    write_stdin_termios
-
-    popad ; pop all registers from the stack
-%endmacro
 
 %macro canonical_off 0
     pushad ; push all registers to the stack

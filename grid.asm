@@ -24,7 +24,30 @@ section .text
 %macro gridInit 0
     pushad ; push all registers to the stack
 
-    generateFood
+    getTerminalSize ; get terminal size
+    
+    mov eax, [terminalHeightOutput] ; set eax to terminal height
+    sub eax, 4 ; add padding of 4 to grid height
+
+    cmp eax, maxGridHeight ; compare eax with maxgridheight
+    jl %%afterGridHeightMax ; if eax < maxgridheight jump to not set to max
+
+    mov eax, maxGridHeight ; set eax to maxgridheight
+%%afterGridHeightMax:
+    mov [gridHeight], eax ; set gridheight to eax
+
+
+    mov eax, [terminalWidthOutput] ; set eax to terminal width
+
+    cmp eax, maxGridWidth ; compare eax with maxgridwidth
+    jl %%afterGridWidthMax ; if eax < maxgridwidth jump to not set to max
+
+    mov eax, maxGridWidth ; set eax to max grid width
+%%afterGridWidthMax:
+    mov [gridWidth], eax ; set gridwidth to eax
+
+
+    calcGridSize ; get new gridsize
 
     popad ; pop all registers from the stack
 %endmacro
@@ -35,6 +58,8 @@ section .text
     mov esi, 4 ; set esi to 2
     setCursor 0, esi ; set cursor y to esi (line 2)
     inc esi ; set to next line
+
+    mov edx, [gridSize]
 
     setTextBackgroundColour gridColour ; set text background colour back to gridcolour
     xor eax, eax ; set eax to 0 (current grid index)
@@ -113,7 +138,7 @@ section .text
     jmp %%toNextLoop ; go to next spot on grid
 %%checkForNewLine: 
     inc eax ; increment eax by 1
-    modulo eax, gridWidth ; do eax % gridwidth
+    modulo eax, [gridWidth] ; do eax % gridwidth
     dec eax ; decrement eax by 1
 
     cmp [moduloResult], word 0 ; compare (eax + 1) % gridwidth with 0
@@ -123,7 +148,7 @@ section .text
 %%toNextLoop:
     inc eax ; increment eax
 
-    cmp eax, gridSize ; compare eax with gridsize
+    cmp eax, edx ; compare eax with gridsize
     jl %%gridLoop ; check if eax < gridSize if it is redo loop
 %%exit:
     popad ; pop all registers from the stack

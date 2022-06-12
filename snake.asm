@@ -12,8 +12,8 @@
 section .data ; initialized variables
     debugMsg db `Got here`, 10, 0
 
-    snakeX dd gridSize dup (0) ; x coordinates for the snake
-    snakeY dd gridSize dup (0) ; y coordinates for the snake
+    snakeX dd maxGridSize dup (0) ; x coordinates for the snake
+    snakeY dd maxGridSize dup (0) ; y coordinates for the snake
     
     snakeChar db ` `, 0
 
